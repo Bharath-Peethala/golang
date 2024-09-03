@@ -3,13 +3,17 @@ package main
 import (
 	"fmt"
 	"golang/basics"
-	"log"
 )
 
 func main() {
-	result, err := basics.DivideTwo(5, 2)
-	if err != nil {
-		log.Fatal(err)
+	store := make(map[string]string)
+	i := 0
+	for i < 5 {
+		numerator := basics.GenerateRandomNumber()
+		denominator := basics.GenerateRandomNumber()
+		store[fmt.Sprintf("%v,%v", numerator, denominator)] = ""
+		i++
 	}
-	fmt.Printf("Result of DivideTwo: %v \n", result)
+	store = basics.StoreResults(store)
+	fmt.Println(store)
 }
