@@ -3,9 +3,13 @@ package main
 import (
 	"fmt"
 	"golang/basics"
+	"log"
 )
 
 func main() {
-	helloWorld := basics.HelloWorld()
-	fmt.Println(helloWorld)
+	result, err := basics.DivideTwo(5, 2)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Printf("Result of DivideTwo: %v \n", result)
 }

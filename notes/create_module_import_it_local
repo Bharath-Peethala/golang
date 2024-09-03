@@ -1,0 +1,7 @@
+IMPORT MODULE IN LOCAL
+
+create a module using go mod init
+
+go mod edit -replace <MODULE_NAME>=<MODULE_PATH_LOCAL>
+
+go mod tidy
