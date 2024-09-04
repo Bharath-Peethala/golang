@@ -1,0 +1,7 @@
+go work init ./module
+
+go work use ./module
+
+go build
+
+go install
