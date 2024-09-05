@@ -1,4 +1,4 @@
-package main
+package bmysql
 
 import (
 	"context"
@@ -12,15 +12,13 @@ import (
 
 var db *sql.DB
 
-var table = "album"
-
-type album struct {
-	title  string
-	artist string
-	price  float64
+type Album struct {
+	Title  string `json:"title"`
+	Artist string `json:"artist"`
+	Price  float64 `json:"price"`
 }
 
-func main() {
+func InitializeConnection() {
 	cfg := mysql.Config{
 		User:   "root",
 		Passwd: "2019",
@@ -40,15 +38,11 @@ func main() {
 		log.Fatal(pingErr)
 	}
 	fmt.Println("Connected!")
-
-	InsertAlbum(album{title: "Indra", artist: "Mani Sharma", price:58.25})
-	DeleteAlbum(1)
-	UpdateAlbum(2, album{title: "OG", artist: "Thaman", price: 100.25})
 }
 
-func InsertAlbum(a album) {
+func InsertAlbum(a Album) {
 	query := "INSERT INTO album (title,artist,price) VALUES(?,?,?)"
-	runQuery(query, table, a.title, a.artist, a.price)
+	runQuery(query, a.Title, a.Artist, a.Price)
 }
 
 func DeleteAlbum(id int) {
@@ -56,9 +50,18 @@ func DeleteAlbum(id int) {
 	runQuery(query, id)
 }
 
-func UpdateAlbum(id int, a album) {
+func UpdateAlbum(id int, a Album) {
 	query := "UPDATE album SET title = ?, artist = ?, price= ?  where id= ?"
-	runQuery(query, a.title, a.artist, a.price, id)
+	runQuery(query, a.Title, a.Artist, a.Price, id)
+}
+
+func GetAllAlbums() []Album {
+	query := "SELECT title,artist,price FROM album"
+	albums, err := getRows(query)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return albums
 }
 
 func runQuery(query string, args ...interface{}) {
@@ -85,4 +88,38 @@ func runQuery(query string, args ...interface{}) {
 	}
 
 	log.Printf("%d Albums affected ", rows)
+}
+
+func getRows(query string) ([]Album, error) {
+	ctx, cancelfunc := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancelfunc()
+
+	stmt, err := db.PrepareContext(ctx, query)
+	if err != nil {
+		log.Printf("Error when preparing SQL statement: %s", err)
+		return []Album{}, err
+	}
+	defer stmt.Close()
+
+	rows, err := stmt.QueryContext(ctx)
+	if err != nil {
+		log.Printf("Error when executing SQL statement: %s", err)
+		return []Album{}, err
+	}
+	defer rows.Close()
+
+	var albums = []Album{}
+	for rows.Next() {
+		var album Album
+		if err := rows.Scan(&album.Title, &album.Artist, &album.Price); err != nil {
+			return []Album{}, err
+		}
+		albums = append(albums, album)
+	}
+
+	if err := rows.Err(); err != nil {
+		return []Album{}, err
+	}
+
+	return albums, nil
 }
