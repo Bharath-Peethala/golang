@@ -13,8 +13,8 @@ import (
 var db *sql.DB
 
 type Album struct {
-	Title  string `json:"title"`
-	Artist string `json:"artist"`
+	Title  string  `json:"title"`
+	Artist string  `json:"artist"`
 	Price  float64 `json:"price"`
 }
 
@@ -40,19 +40,31 @@ func InitializeConnection() {
 	fmt.Println("Connected!")
 }
 
-func InsertAlbum(a Album) {
+func InsertAlbum(a Album) (int64, error) {
 	query := "INSERT INTO album (title,artist,price) VALUES(?,?,?)"
-	runQuery(query, a.Title, a.Artist, a.Price)
+	rows, err := runQuery(query, a.Title, a.Artist, a.Price)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return rows, err
 }
 
-func DeleteAlbum(id int) {
+func DeleteAlbum(id int) int64 {
 	query := "DELETE FROM album where id= ?"
-	runQuery(query, id)
+	rows, err := runQuery(query, id)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return rows
 }
 
-func UpdateAlbum(id int, a Album) {
+func UpdateAlbum(id int, a Album) (int64,error) {
 	query := "UPDATE album SET title = ?, artist = ?, price= ?  where id= ?"
-	runQuery(query, a.Title, a.Artist, a.Price, id)
+	rows, err := runQuery(query, a.Title, a.Artist, a.Price, id)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return rows,err
 }
 
 func GetAllAlbums() []Album {
@@ -64,30 +76,31 @@ func GetAllAlbums() []Album {
 	return albums
 }
 
-func runQuery(query string, args ...interface{}) {
+func runQuery(query string, args ...interface{}) (int64, error) {
 	ctx, cancelfunc := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancelfunc()
 
 	stmt, err := db.PrepareContext(ctx, query)
 	if err != nil {
 		log.Printf("Error when preparing SQL statement: %s", err)
-		return
+		return 0, err
 	}
 	defer stmt.Close()
 
 	res, err := stmt.ExecContext(ctx, args...)
 	if err != nil {
 		log.Printf("Error when executing SQL statement: %s", err)
-		return
+		return 0, err
 	}
 
 	rows, err := res.RowsAffected()
 	if err != nil {
 		log.Printf("Error when finding rows affected: %s", err)
-		return
+		return 0, err
 	}
 
 	log.Printf("%d Albums affected ", rows)
+	return rows, nil
 }
 
 func getRows(query string) ([]Album, error) {
