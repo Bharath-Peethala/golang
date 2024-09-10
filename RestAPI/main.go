@@ -2,6 +2,7 @@ package main
 
 import (
 	"golang/bmysql"
+	"golang/bmysql/entities"
 	"net/http"
 	"strconv"
 
@@ -30,7 +31,7 @@ func main() {
 }
 
 func getAllAlbums(ctx *gin.Context) {
-	ctx.JSON(http.StatusOK, bmysql.GetAllAlbums())
+	ctx.JSON(http.StatusOK, entities.GetAllAlbums())
 }
 
 func deleteAlbum(ctx *gin.Context) {
@@ -47,7 +48,7 @@ func deleteAlbum(ctx *gin.Context) {
 		return
 	}
 
-	rows := bmysql.DeleteAlbum(int(id))
+	rows := entities.DeleteAlbum(int(id))
 	if rows == 0 {
 		resp = response{
 			Code:   http.StatusNotFound,
@@ -66,7 +67,7 @@ func deleteAlbum(ctx *gin.Context) {
 
 func createAlbum(ctx *gin.Context) {
 	var resp response
-	var album bmysql.Album
+	var album entities.Album
 
 	err := ctx.ShouldBindJSON(&album)
 	if err != nil {
@@ -78,7 +79,7 @@ func createAlbum(ctx *gin.Context) {
 		return
 	}
 
-	rows, err := bmysql.InsertAlbum(album)
+	rows, err := entities.InsertAlbum(album)
 	if err != nil && rows == 0 {
 		resp = response{
 			Code:   http.StatusInternalServerError,
@@ -97,7 +98,7 @@ func createAlbum(ctx *gin.Context) {
 
 func updateAlbum(ctx *gin.Context) {
 	var resp response
-	var album bmysql.Album
+	var album entities.Album
 	paramId := ctx.Param("id")
 	id, err := strconv.Atoi(paramId)
 
@@ -120,7 +121,7 @@ func updateAlbum(ctx *gin.Context) {
 		return
 	}
 
-	rows, err := bmysql.UpdateAlbum(id,album)
+	rows, err := entities.UpdateAlbum(id,album)
 	if err != nil && rows == 0 {
 		resp = response{
 			Code:   http.StatusInternalServerError,
