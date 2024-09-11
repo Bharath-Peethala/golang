@@ -15,5 +15,6 @@ func main() {
 		i++
 	}
 	store = basics.StoreResults(store)
+	basics.Generics()
 	fmt.Println(store)
 }

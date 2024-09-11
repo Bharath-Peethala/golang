@@ -8,6 +8,10 @@ import (
 	"strings"
 )
 
+type Number interface{
+	int64 | float64
+}
+
 func HelloWorld() string {
 	return fmt.Sprintf("Hello World!")
 }
@@ -32,4 +36,32 @@ func StoreResults(store map[string]string) map[string]string {
 		store[numsStr] = fmt.Sprintf("%.2f", result)
 	}
 	return store
+}
+
+func Generics(){
+	ints := map[string]int64{
+		"num1":1,
+		"num2":2,
+	}
+	floats := map[string]float64{
+		"num1":1.2,
+		"num2":2.3,
+	}
+	
+	numsArr := map[int]float64{
+		1:1.2,
+		2:2.3,
+	}
+
+	fmt.Println(SumIntOrFloats(ints))
+	fmt.Println(SumIntOrFloats(floats))
+	fmt.Println(SumIntOrFloats(numsArr))
+}
+
+func SumIntOrFloats[K comparable, V Number](numsMap map[K]V) V{
+	var sum V
+	for _, num := range numsMap{
+		sum += num
+	}
+	return sum
 }
