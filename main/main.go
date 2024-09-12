@@ -22,15 +22,15 @@ func main() {
 	fmt.Println(store)
 }
 
-func Reverse(s string) (string,error){
+func Reverse(s string) (string, error) {
 	fmt.Printf("input: %q\n", s)
 	r := []rune(s)
-	 fmt.Printf("runes: %q\n", r)
+	fmt.Printf("runes: %q\n", r)
 	if !utf8.ValidString(s) {
-        return s, errors.New("input is not valid UTF-8")
-    }
-	for i,j:=0,len(r)-1;i < len(r)/2;i,j = i+1, j-1{
-		r[i],r[j] = r[j],r[i]
+		return s, errors.New("input is not valid UTF-8")
 	}
-	return string(r),nil
+	for i, j := 0, len(r)-1; i < len(r)/2; i, j = i+1, j-1 {
+		r[i], r[j] = r[j], r[i]
+	}
+	return string(r), nil
 }

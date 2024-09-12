@@ -5,3 +5,8 @@ go work use ./module
 go build
 
 go install
+
+go install golang.org/x/vuln/cmd/govulncheck@latest
+
+Checks ths vulnerable dependencies 
+govulncheck ./...
